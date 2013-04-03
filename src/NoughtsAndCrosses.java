@@ -46,7 +46,6 @@ public class NoughtsAndCrosses
             drawGrid(board);
             if (playerTurn)
             {
-                System.out.println("Please enter a number 0-9, where you wish to place your counter");
                 board = getPlayerMove(board);
                 if (isWinningMove(board, playerSymbol) || isBoardFull(board))
                 {
@@ -59,7 +58,6 @@ public class NoughtsAndCrosses
             }
             else    // i.e. the computer's turn
             {
-                System.out.println("Computer now moving...");
                 board = getComputerMove(board);
                 if (isWinningMove(board, computerSymbol) || isBoardFull(board))
                 {
@@ -122,8 +120,10 @@ public class NoughtsAndCrosses
 
     public char[] getComputerMove(char[] boardState)
     {
+        System.out.println("Computer now moving...");
         int move = randomGenerator.nextInt(9);
         board[move - 1] = computerSymbol;
+        spaceTaken[move - 1] = true;
         return boardState;
     }
 
@@ -136,6 +136,7 @@ public class NoughtsAndCrosses
         if (!spaceTaken[move - 1])
         {
             board[move - 1] = playerSymbol;
+            spaceTaken[move - 1] = true;
         }
         else
         {
