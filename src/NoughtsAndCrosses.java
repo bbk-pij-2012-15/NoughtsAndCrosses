@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -166,6 +167,35 @@ public class NoughtsAndCrosses
         }
         else
             getComputerMove(board);
+
+        char[] hypotheticalBoard = new char[9];
+        ArrayList<Integer> moveOptions = new ArrayList<Integer>();
+        for (int i = 0; i < board.length; i++)
+        {
+            hypotheticalBoard[i] = board[i];    // copy board into hypoBoard
+            if (hypotheticalBoard[i] != playerSymbol || hypotheticalBoard[i] != computerSymbol) // then space is free
+            {
+                moveOptions.add(i);
+            }
+
+        }
+
+        for (int i : moveOptions)
+        {
+            hypotheticalBoard[i] = computerSymbol;      // sets square to computer symbol, as if move had been played
+            if (isWinningMove(hypotheticalBoard, computerSymbol))
+            {
+                move(board, computerSymbol, i);        // if computer can make winning move, make it
+            }
+            hypotheticalBoard[i] = (char) i;    // resets square
+            hypotheticalBoard[i] = playerSymbol;        // sets square to player symbol, as if move had been played
+            if (isWinningMove(hypotheticalBoard, playerSymbol))
+            {
+                move(board, computerSymbol, i);     // if computer can block the player's winning move, it does
+            }
+            hypotheticalBoard[i] = (char) i;    // resets square
+            if
+        }
 
         return boardState;
     }
