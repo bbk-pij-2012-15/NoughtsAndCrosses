@@ -6,6 +6,7 @@ public class NoughtsAndCrosses
     char playerSymbol;
     char computerSymbol;
     char[] board = new char[9];     // array to hold what is on each square of the board
+    boolean[] spaceFree = new boolean[9];      // array to hold whether a square of the board is free or not
     boolean over = false;
     Random randomGenerator = new Random();
 
@@ -24,7 +25,8 @@ public class NoughtsAndCrosses
     {
         for (int i = 0; i < board.length; i++)
         {
-            board[i] = ' ';
+            char ch = (char) ('1' + i);        // casts int to a char for our char array, and makes it 1-9 not 0-8
+            board[i] = ch;
         }
     }
 
@@ -41,11 +43,12 @@ public class NoughtsAndCrosses
     {
         if (playerGoesFirst)
         {
-
+            System.out.println("Please enter a number 0-9, where you wish to place your counter");
+            board = getPlayerMove(board);
         }
         else
         {
-
+            board = getComputerMove(board);
         }
 
 
@@ -59,10 +62,41 @@ public class NoughtsAndCrosses
         }
     }
 
+    public char[] move(char[] boardState, char x_or_o, int where)
+    {
+        board[where - 1] = x_or_o;
+        return board;
+    }
+
+    public char[] getComputerMove(char[] boardState)
+    {
+        int move = generateComputerMove();
+        board[move - 1] = playerSymbol;
+        return boardState;
+    }
+
+    public char[] getPlayerMove(char[] boardState)
+    {
+        Scanner in = new Scanner(System.in);
+        System.out.println("Please enter a number 0-9, where you wish to place your counter");
+        int move = in.nextInt();
+
+        if (spaceFree[move - 1])
+        {
+            board[move - 1] = playerSymbol;
+        }
+        else
+        {
+            System.out.println("That space is taken! Please try again");
+            getPlayerMove(board);
+        }
+        return boardState;
+    }
+
     public boolean whoFirst()
     {
         boolean playerFirst = randomGenerator.nextBoolean();
-        if (playerFirst)
+        if (!playerFirst)
         {
             System.out.println("The computer will go first... ");
         }
