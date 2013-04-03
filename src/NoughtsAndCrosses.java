@@ -77,24 +77,30 @@ public class NoughtsAndCrosses
 
     public void endgame(boolean isPlayerTurn)
     {
-        if (isBoardFull(board))     // must be a tie
+        if (isBoardFull(board) && !isWinningMove(board, playerSymbol) && !isWinningMove(board, computerSymbol))     // must be a tie
         {
             System.out.println("A tie after 9 moves total!");
+            playAgain();
         }
 
         if (isPlayerTurn)   // player must have won
         {
-            System.out.println("Congratulations! You beat the computer in " + playerMoves + "moves!");
+            System.out.println("Congratulations! You beat the computer in " + playerMoves + " moves!");
         }
         else        // comp has won
         {
-            System.out.println("Unlucky! The computer beat you in " + computerMoves + "moves!");
+            System.out.println("Unlucky! The computer beat you in " + computerMoves + " moves!");
         }
+        playAgain();
+
+    }
+
+    public void playAgain()
+    {
         Scanner in = new Scanner(System.in);
         System.out.println("Would you like to play again? [y/n]");
         if (in.next().charAt(0) == 'y' || in.next().charAt(0) == 'Y')
         {
-            in.close();
             NoughtsAndCrosses game = new NoughtsAndCrosses();
             game.start();
         }
@@ -145,18 +151,21 @@ public class NoughtsAndCrosses
 
     public char[] move(char[] boardState, char x_or_o, int where)
     {
-        board[where - 1] = x_or_o;
-        spaceTaken[where - 1] = true;
+        board[where] = x_or_o;
+        spaceTaken[where] = true;
         return board;
     }
 
     public char[] getComputerMove(char[] boardState)
     {
-        System.out.println("Computer now moving...");
         int move = randomGenerator.nextInt(9);
-        if (!spaceTaken[move - 1])
+        if (!spaceTaken[move])
+        {
             move(board, computerSymbol, move);
-        else getComputerMove(board);
+            System.out.println("Computer now moving...");
+        }
+        else
+            getComputerMove(board);
 
         return boardState;
     }
@@ -165,9 +174,9 @@ public class NoughtsAndCrosses
     {
         Scanner in = new Scanner(System.in);
         System.out.println("Please enter a number 0-9, where you wish to place your counter");
-        int move = in.nextInt();
+        int move = (in.nextInt() - 1);
 
-        if (!spaceTaken[move - 1])
+        if (!spaceTaken[move])
         {
             move(board, playerSymbol, move);
         }
