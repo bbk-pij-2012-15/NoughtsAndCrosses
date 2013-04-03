@@ -9,6 +9,7 @@ public class NoughtsAndCrosses
     boolean[] spaceTaken = new boolean[9];      // array to hold whether a square of the board is free or not
     boolean over = false, winningMove = false, boardFull = false;
     Random randomGenerator = new Random();
+    int playerMoves, computerMoves;
 
     public static void main(String[] args)
     {
@@ -47,6 +48,7 @@ public class NoughtsAndCrosses
             if (playerTurn)
             {
                 board = getPlayerMove(board);
+                playerMoves++;
                 if (isWinningMove(board, playerSymbol) || isBoardFull(board))
                 {
                     over = true;
@@ -59,6 +61,7 @@ public class NoughtsAndCrosses
             else    // i.e. the computer's turn
             {
                 board = getComputerMove(board);
+                computerMoves++;
                 if (isWinningMove(board, computerSymbol) || isBoardFull(board))
                 {
                     over = true;
@@ -69,6 +72,34 @@ public class NoughtsAndCrosses
                 }
             }
         }
+        endgame(playerTurn);
+    }
+
+    public void endgame(boolean isPlayerTurn)
+    {
+        if (isBoardFull(board))     // must be a tie
+        {
+            System.out.println("A tie after 9 moves total!");
+        }
+
+        if (isPlayerTurn)   // player must have won
+        {
+            System.out.println("Congratulations! You beat the computer in " + playerMoves + "moves!");
+        }
+        else        // comp has won
+        {
+            System.out.println("Unlucky! The computer beat you in " + computerMoves + "moves!");
+        }
+        Scanner in = new Scanner(System.in);
+        System.out.println("Would you like to play again? [y/n]");
+        if (in.next().charAt(0) == 'y' || in.next().charAt(0) == 'Y')
+        {
+            in.close();
+            NoughtsAndCrosses game = new NoughtsAndCrosses();
+            game.start();
+        }
+        else
+            System.exit(0);
     }
 
     public static boolean isBoardFull(char[] board)
@@ -115,6 +146,7 @@ public class NoughtsAndCrosses
     public char[] move(char[] boardState, char x_or_o, int where)
     {
         board[where - 1] = x_or_o;
+        spaceTaken[where - 1] = true;
         return board;
     }
 
@@ -122,8 +154,10 @@ public class NoughtsAndCrosses
     {
         System.out.println("Computer now moving...");
         int move = randomGenerator.nextInt(9);
-        board[move - 1] = computerSymbol;
-        spaceTaken[move - 1] = true;
+        if (!spaceTaken[move - 1])
+            move(board, computerSymbol, move);
+        else getComputerMove(board);
+
         return boardState;
     }
 
@@ -135,8 +169,7 @@ public class NoughtsAndCrosses
 
         if (!spaceTaken[move - 1])
         {
-            board[move - 1] = playerSymbol;
-            spaceTaken[move - 1] = true;
+            move(board, playerSymbol, move);
         }
         else
         {
