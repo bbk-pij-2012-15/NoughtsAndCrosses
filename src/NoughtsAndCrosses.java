@@ -177,7 +177,6 @@ public class NoughtsAndCrosses
             {
                 moveOptions.add(i);
             }
-
         }
 
         for (int i : moveOptions)
@@ -186,18 +185,40 @@ public class NoughtsAndCrosses
             if (isWinningMove(hypotheticalBoard, computerSymbol))
             {
                 move(board, computerSymbol, i);        // if computer can make winning move, make it
+                hypotheticalBoard[i] = (char) i;    // resets square
+                return board;
             }
-            hypotheticalBoard[i] = (char) i;    // resets square
             hypotheticalBoard[i] = playerSymbol;        // sets square to player symbol, as if move had been played
             if (isWinningMove(hypotheticalBoard, playerSymbol))
             {
                 move(board, computerSymbol, i);     // if computer can block the player's winning move, it does
+                hypotheticalBoard[i] = (char) i;    // resets square
+                return board;
             }
-            hypotheticalBoard[i] = (char) i;    // resets square
-            if
+            else if (board[6] == '7' || board[8] == '9' || board[0] == '1' || board[2] == '3') // if a corner is free
+            {
+                Integer[] corners = new Integer[] {0, 2, 6, 8};
+                int mv = randomArrayElem(corners);
+                move(board, computerSymbol, mv);
+            }
+            else if (board[4] == '5') // if middle space is free
+            {
+                move(board, computerSymbol, board[4]);
+            }
+            else if (board[3] == '4' || board[7] == '8' || board[5] == '6' || board[1] == '2') // if a side space is free
+            {
+                Integer[] sides = new Integer[] {1, 3, 5, 7};
+                int mv = randomArrayElem(sides);
+                move(board, computerSymbol, mv);
+            }
         }
-
         return boardState;
+    }
+
+    public <anyType> anyType randomArrayElem(anyType[] array)
+    {
+        int randomIndex = randomGenerator.nextInt(array.length);
+        return array[randomIndex];
     }
 
     public char[] getPlayerMove(char[] boardState)
