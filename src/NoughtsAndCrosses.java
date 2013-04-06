@@ -11,6 +11,7 @@ public class NoughtsAndCrosses
     boolean over = false, winningMove = false, boardFull = false;
     Random randomGenerator = new Random();
     int playerMoves, computerMoves;
+    private char difficulty;
 
     public static void main(String[] args)
     {
@@ -36,9 +37,29 @@ public class NoughtsAndCrosses
     {
         System.out.println("Welcome to Noughts and Crosses! Will you be X or O? ");
         getSymbols();
+        System.out.println("Now please select a difficulty - (e)asy, (i)ntermediate or (h)ard?" );
+        setDifficulty();
         System.out.println("You will be " + playerSymbol + ", the computer will be " + computerSymbol + ". Let's Play!");
         boolean turn = whoFirst();
         play(turn);
+    }
+
+    public void setDifficulty()
+    {
+        Scanner in = new Scanner(System.in);
+        String input = in.next().toLowerCase();
+        while (true)
+        {
+            if (input.charAt(0) == 'h' || input.charAt(0) == 'i' || input.charAt(0) == 'e')
+            {
+                difficulty = input.charAt(0);
+                break;
+            }
+            else        // invalid input
+            {
+                System.out.println("Please choose hard, intermediate or easy!");
+            }
+        }
     }
 
     public void play(boolean playerTurn)
@@ -48,7 +69,7 @@ public class NoughtsAndCrosses
             drawGrid(board);
             if (playerTurn)
             {
-                board = getPlayerMove(board);
+                getPlayerMove();
                 playerMoves++;
                 if (isWinningMove(board, playerSymbol) || isBoardFull(board))
                 {
@@ -61,7 +82,7 @@ public class NoughtsAndCrosses
             }
             else    // i.e. the computer's turn
             {
-                board = getComputerMove(board);
+                getCompMove(difficulty);
                 computerMoves++;
                 if (isWinningMove(board, computerSymbol) || isBoardFull(board))
                 {
@@ -157,7 +178,75 @@ public class NoughtsAndCrosses
         return board;
     }
 
-    public char[] getComputerMove(char[] boardState)
+    public void getCompMove(char difficulty)
+    {
+        System.out.println("Computer now moving...");
+        char[] hypotheticalBoard = new char[9];
+        ArrayList<Integer> moveOptions = new ArrayList<Integer>();    // list of possible squares computer can move
+
+        for (int i = 0; i < board.length; i++)
+        {
+            hypotheticalBoard[i] = board[i];    // copy board into hypoBoard
+            if (hypotheticalBoard[i] != playerSymbol || hypotheticalBoard[i] != computerSymbol) // then space is free
+            {
+                moveOptions.add(i);   // populate moveOptions
+            }
+        }
+
+        switch (difficulty)
+        {
+            case 'h':
+                for (int emptySquare : moveOptions)
+                {
+                    hypotheticalBoard[emptySquare] = computerSymbol;
+                    if (isWinningMove(hypotheticalBoard, computerSymbol))
+                    {
+                        move(board, computerSymbol, emptySquare);
+                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
+                        return;
+                    }
+                    hypotheticalBoard[emptySquare] = playerSymbol;
+                    if (isWinningMove(hypotheticalBoard, playerSymbol))
+                    {
+                        move(board, computerSymbol, emptySquare);
+                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
+                        return;
+                    }
+                }
+                getCompMove('i');
+            case 'i':
+                if (board[6] == '7' || board[8] == '9' || board[0] == '1' || board[2] == '3') // if a corner is free
+                {
+                    Integer[] corners = new Integer[] {0, 2, 6, 8};
+                    int mv = randomArrayElem(corners);
+                    if (!spaceTaken[mv])
+                        move(board, computerSymbol, mv);
+                    else
+                        getComputerMove('i');
+                }
+                else if (board[4] == '5') // if middle space is free
+                {
+                    move(board, computerSymbol, 4);
+                }
+                else if (board[3] == '4' || board[7] == '8' || board[5] == '6' || board[1] == '2') // if a side space is free
+                {
+                    Integer[] sides = new Integer[] {1, 3, 5, 7};
+                    int mv = randomArrayElem(sides);
+                    if (!spaceTaken[mv])
+                        move(board, computerSymbol, mv);
+                    else
+                        getComputerMove('i');
+                }
+            case 'e':
+                int randomMove = randomGenerator.nextInt(9);
+                if (!spaceTaken[randomMove])
+                    move(board, computerSymbol, randomMove);
+                else
+                    getComputerMove('e');
+        }
+    }
+
+    public void getComputerMove(char difficulty)
     {
         System.out.println("Computer now moving...");
         char[] hypotheticalBoard = new char[9];
@@ -178,7 +267,7 @@ public class NoughtsAndCrosses
             {
                 move(board, computerSymbol, i);        // if computer can make winning move, make it
                 hypotheticalBoard[i] = (char) i;    // resets square
-                return board;
+                //return board;
             }
             hypotheticalBoard[i] = (char) i;    // resets square
         }
@@ -189,7 +278,7 @@ public class NoughtsAndCrosses
             {
                 move(board, computerSymbol, i);     // if computer can block the player's winning move, it does
                 hypotheticalBoard[i] = (char) i;    // resets square
-                return board;
+                //return board;
             }
             hypotheticalBoard[i] = (char) i;    // resets square
         }
@@ -201,15 +290,11 @@ public class NoughtsAndCrosses
             if (!spaceTaken[mv])
                 move(board, computerSymbol, mv);
             else
-                getComputerMove(board);
+                getComputerMove(difficulty);
         }
         else if (board[4] == '5') // if middle space is free
         {
-            int mv = board[4];
-            if (!spaceTaken[mv])
-                move(board, computerSymbol, mv);
-            else
-                getComputerMove(board);
+            move(board, computerSymbol, 4);
         }
         else if (board[3] == '4' || board[7] == '8' || board[5] == '6' || board[1] == '2') // if a side space is free
         {
@@ -218,10 +303,10 @@ public class NoughtsAndCrosses
             if (!spaceTaken[mv])
                 move(board, computerSymbol, mv);
             else
-                getComputerMove(board);
+                getComputerMove(difficulty);
         }
 
-        return boardState;
+        //return boardState;
     }
 
     public <anyType> anyType randomArrayElem(anyType[] array)
@@ -230,10 +315,10 @@ public class NoughtsAndCrosses
         return array[randomIndex];
     }
 
-    public char[] getPlayerMove(char[] boardState)
+    public void getPlayerMove()
     {
         Scanner in = new Scanner(System.in);
-        System.out.println("Please enter a number 0-9, where you wish to place your counter");
+        System.out.println("Please enter a number 1-9, where you wish to place your counter");
         int move = (in.nextInt() - 1);
 
         if (!spaceTaken[move])
@@ -243,9 +328,8 @@ public class NoughtsAndCrosses
         else
         {
             System.out.println("That space is taken! Please try again");
-            getPlayerMove(board);
+            getPlayerMove();
         }
-        return boardState;
     }
 
     public boolean whoFirst()
@@ -264,9 +348,9 @@ public class NoughtsAndCrosses
 
     public void getSymbols()
     {
-        while (true)
+        Scanner in = new Scanner(System.in);
+        while (playerSymbol == '\u0000' && computerSymbol == '\u0000')
         {
-            Scanner in = new Scanner(System.in);
             String input = in.next();
             if (input.length() > 1)
             {
@@ -277,12 +361,12 @@ public class NoughtsAndCrosses
                 if (input.charAt(0) == 'o' || input.charAt(0) == 'O')
                 {
                     playerSymbol = '\u25CF';
-                    computerSymbol = '\u2718';return;
+                    computerSymbol = '\u2718';
                 }
                 else if (input.charAt(0) == 'x' || input.charAt(0) == 'X')
                 {
                     playerSymbol = '\u2718';
-                    computerSymbol = '\u25CF';return;
+                    computerSymbol = '\u25CF';
                 }
                 else
                 {
@@ -290,6 +374,7 @@ public class NoughtsAndCrosses
                 }
             }
         }
+        in.reset();
     }
 
     public void drawGrid(char[] board)
