@@ -99,6 +99,7 @@ public class NoughtsAndCrosses
 
     public void endgame(boolean isPlayerTurn)
     {
+        drawGrid(board);
         if (isBoardFull(board) && !isWinningMove(board, playerSymbol) && !isWinningMove(board, computerSymbol))     // must be a tie
         {
             System.out.println("A tie after 9 moves total!");
@@ -187,7 +188,7 @@ public class NoughtsAndCrosses
         for (int i = 0; i < board.length; i++)
         {
             hypotheticalBoard[i] = board[i];    // copy board into hypoBoard
-            if (hypotheticalBoard[i] != playerSymbol || hypotheticalBoard[i] != computerSymbol) // then space is free
+            if (hypotheticalBoard[i] != playerSymbol && hypotheticalBoard[i] != computerSymbol) // then space is free
             {
                 moveOptions.add(i);   // populate moveOptions
             }
@@ -196,6 +197,18 @@ public class NoughtsAndCrosses
         switch (difficulty)
         {
             case 'h':
+
+                for (int emptySquare : moveOptions)
+                {
+                    hypotheticalBoard[emptySquare] = playerSymbol;
+                    if (isWinningMove(hypotheticalBoard, playerSymbol))
+                    {
+                        move(board, computerSymbol, emptySquare);
+                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
+                    }
+                }
+                getCompMove('i');
+            case 'i':
                 for (int emptySquare : moveOptions)
                 {
                     hypotheticalBoard[emptySquare] = computerSymbol;
@@ -205,24 +218,17 @@ public class NoughtsAndCrosses
                         hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
                         return;
                     }
-                    hypotheticalBoard[emptySquare] = playerSymbol;
-                    if (isWinningMove(hypotheticalBoard, playerSymbol))
-                    {
-                        move(board, computerSymbol, emptySquare);
-                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
-                        return;
-                    }
                 }
-                getCompMove('i');
-            case 'i':
                 if (board[6] == '7' || board[8] == '9' || board[0] == '1' || board[2] == '3') // if a corner is free
                 {
                     Integer[] corners = new Integer[] {0, 2, 6, 8};
                     int mv = randomArrayElem(corners);
                     if (!spaceTaken[mv])
+                    {
                         move(board, computerSymbol, mv);
-                    else
-                        getComputerMove('i');
+                        return;
+                    }
+                    else getComputerMove('i');
                 }
                 else if (board[4] == '5') // if middle space is free
                 {
