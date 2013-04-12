@@ -171,11 +171,10 @@ public class NoughtsAndCrosses
         return won;
     }
 
-    public char[] move(char[] boardState, char x_or_o, int where)
+    public void move(char x_or_o, int where)
     {
         board[where] = x_or_o;
         spaceTaken[where] = true;
-        return board;
     }
 
     public void getCompMove(char difficulty)
@@ -202,7 +201,7 @@ public class NoughtsAndCrosses
                     hypotheticalBoard[emptySquare] = playerSymbol;
                     if (isWinningMove(hypotheticalBoard, playerSymbol))
                     {
-                        move(board, computerSymbol, emptySquare);
+                        move(computerSymbol, emptySquare);
                         return;
                     }
                     hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
@@ -219,7 +218,7 @@ public class NoughtsAndCrosses
                         System.out.println("IN UR INT WINNING MV");
                         draw(hypotheticalBoard);
                         System.out.println("END DRAW SEQUENCE");
-                        move(board, computerSymbol, emptySquare);
+                        move(computerSymbol, emptySquare);
                         return;
                     }
                     hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
@@ -230,12 +229,12 @@ public class NoughtsAndCrosses
                     int[] corners = new int[] {0, 2, 6, 8};
                     List<Integer> freeCorners = getLegitMoves(corners);
                     int mv = randomElement(freeCorners);
-                    move(board, computerSymbol, mv); return;
+                    move(computerSymbol, mv); return;
                 }
                 else if (moveOptions.contains(4)) // if middle space is free
                 {
                     System.out.println("IN UR MIDDLE");
-                    move(board, computerSymbol, 4);     // no need to check if it's free, the else if does it for us
+                    move(computerSymbol, 4);     // no need to check if it's free, the else if does it for us
                     return;
                 }
                 else     // if a side space is free
@@ -244,14 +243,14 @@ public class NoughtsAndCrosses
                     int[] sides = new int[] {1, 3, 5, 7};
                     List<Integer> freeSides = getLegitMoves(sides);
                     int mv = randomElement(freeSides);
-                    move(board, computerSymbol, mv); return;
+                    move(computerSymbol, mv); return;
                 }
             case 'e':
                 System.out.println("IN UR EASY");
                 int[] allPossMoves = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
                 List<Integer> freeRandomSpaces = getLegitMoves(allPossMoves);
                 int mv = randomElement(freeRandomSpaces);
-                move(board, computerSymbol, mv);
+                move(computerSymbol, mv);
                 break;
         }
     }
@@ -281,7 +280,7 @@ public class NoughtsAndCrosses
 
         if (!spaceTaken[move])
         {
-            move(board, playerSymbol, move);
+            move(playerSymbol, move);
         }
         else
         {
