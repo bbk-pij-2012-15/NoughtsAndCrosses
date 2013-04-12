@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class NoughtsAndCrosses
 {
@@ -66,7 +64,7 @@ public class NoughtsAndCrosses
     {
         while (!over)
         {
-            drawGrid(board);
+            draw(board);
             if (playerTurn)
             {
                 getPlayerMove();
@@ -99,7 +97,7 @@ public class NoughtsAndCrosses
 
     public void endgame(boolean isPlayerTurn)
     {
-        drawGrid(board);
+        draw(board);
         if (isBoardFull(board) && !isWinningMove(board, playerSymbol) && !isWinningMove(board, computerSymbol))     // must be a tie
         {
             System.out.println("A tie after 9 moves total!");
@@ -122,7 +120,8 @@ public class NoughtsAndCrosses
     {
         Scanner in = new Scanner(System.in);
         System.out.println("Would you like to play again? [y/n]");
-        if (in.next().charAt(0) == 'y' || in.next().charAt(0) == 'Y')
+        String input = in.next().toLowerCase();
+        if (input.charAt(0) == 'y')
         {
             NoughtsAndCrosses game = new NoughtsAndCrosses();
             game.start();
@@ -197,128 +196,81 @@ public class NoughtsAndCrosses
         switch (difficulty)
         {
             case 'h':
-
-                for (int emptySquare : moveOptions)
+                System.out.println("IN UR HARD");
+                for (Integer emptySquare : moveOptions)
                 {
                     hypotheticalBoard[emptySquare] = playerSymbol;
                     if (isWinningMove(hypotheticalBoard, playerSymbol))
                     {
                         move(board, computerSymbol, emptySquare);
-                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
+                        return;
                     }
+                    hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
                 }
                 getCompMove('i');
+                break;
             case 'i':
-                for (int emptySquare : moveOptions)
+                System.out.println("IN UR INTERMEDIATE");
+                for (Integer emptySquare : moveOptions)
                 {
                     hypotheticalBoard[emptySquare] = computerSymbol;
                     if (isWinningMove(hypotheticalBoard, computerSymbol))
                     {
+                        System.out.println("IN UR INT WINNING MV");
+                        draw(hypotheticalBoard);
+                        System.out.println("END DRAW SEQUENCE");
                         move(board, computerSymbol, emptySquare);
-                        hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
                         return;
                     }
+                    hypotheticalBoard[emptySquare] = (char) ('0' + emptySquare);
                 }
-                if (board[6] == '7' || board[8] == '9' || board[0] == '1' || board[2] == '3') // if a corner is free
+                if (moveOptions.contains(0) || moveOptions.contains(2) || moveOptions.contains(6) || moveOptions.contains(8)) // if a corner is free
                 {
-                    Integer[] corners = new Integer[] {0, 2, 6, 8};
-                    int mv = randomArrayElem(corners);
-                    if (!spaceTaken[mv])
-                    {
-                        move(board, computerSymbol, mv);
-                        return;
-                    }
-                    else getComputerMove('i');
+                    System.out.println("IN UR CORNERZ");
+                    int[] corners = new int[] {0, 2, 6, 8};
+                    List<Integer> freeCorners = getLegitMoves(corners);
+                    int mv = randomElement(freeCorners);
+                    move(board, computerSymbol, mv); return;
                 }
-                else if (board[4] == '5') // if middle space is free
+                else if (moveOptions.contains(4)) // if middle space is free
                 {
-                    move(board, computerSymbol, 4);
+                    System.out.println("IN UR MIDDLE");
+                    move(board, computerSymbol, 4);     // no need to check if it's free, the else if does it for us
+                    return;
                 }
-                else if (board[3] == '4' || board[7] == '8' || board[5] == '6' || board[1] == '2') // if a side space is free
+                else     // if a side space is free
                 {
-                    Integer[] sides = new Integer[] {1, 3, 5, 7};
-                    int mv = randomArrayElem(sides);
-                    if (!spaceTaken[mv])
-                        move(board, computerSymbol, mv);
-                    else
-                        getComputerMove('i');
+                    System.out.println("IN UR SIDEZ");
+                    int[] sides = new int[] {1, 3, 5, 7};
+                    List<Integer> freeSides = getLegitMoves(sides);
+                    int mv = randomElement(freeSides);
+                    move(board, computerSymbol, mv); return;
                 }
             case 'e':
-                int randomMove = randomGenerator.nextInt(9);
-                if (!spaceTaken[randomMove])
-                    move(board, computerSymbol, randomMove);
-                else
-                    getComputerMove('e');
+                System.out.println("IN UR EASY");
+                int[] allPossMoves = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+                List<Integer> freeRandomSpaces = getLegitMoves(allPossMoves);
+                int mv = randomElement(freeRandomSpaces);
+                move(board, computerSymbol, mv);
+                break;
         }
     }
 
-    public void getComputerMove(char difficulty)
+    public <anyType> anyType randomElement(List<anyType> list)
     {
-        System.out.println("Computer now moving...");
-        char[] hypotheticalBoard = new char[9];
-        ArrayList<Integer> moveOptions = new ArrayList<Integer>();
-        for (int i = 0; i < board.length; i++)
-        {
-            hypotheticalBoard[i] = board[i];    // copy board into hypoBoard
-            if (hypotheticalBoard[i] != playerSymbol || hypotheticalBoard[i] != computerSymbol) // then space is free
-            {
-                moveOptions.add(i);
-            }
-        }
-
-        for (int i : moveOptions)
-        {
-            hypotheticalBoard[i] = computerSymbol;      // sets square to computer symbol, as if move had been played
-            if (isWinningMove(hypotheticalBoard, computerSymbol))
-            {
-                move(board, computerSymbol, i);        // if computer can make winning move, make it
-                hypotheticalBoard[i] = (char) i;    // resets square
-                //return board;
-            }
-            hypotheticalBoard[i] = (char) i;    // resets square
-        }
-        for (int i : moveOptions)
-        {
-            hypotheticalBoard[i] = playerSymbol;        // sets square to player symbol, as if move had been played
-            if (isWinningMove(hypotheticalBoard, playerSymbol))
-            {
-                move(board, computerSymbol, i);     // if computer can block the player's winning move, it does
-                hypotheticalBoard[i] = (char) i;    // resets square
-                //return board;
-            }
-            hypotheticalBoard[i] = (char) i;    // resets square
-        }
-
-        if (board[6] == '7' || board[8] == '9' || board[0] == '1' || board[2] == '3') // if a corner is free
-        {
-            Integer[] corners = new Integer[] {0, 2, 6, 8};
-            int mv = randomArrayElem(corners);
-            if (!spaceTaken[mv])
-                move(board, computerSymbol, mv);
-            else
-                getComputerMove(difficulty);
-        }
-        else if (board[4] == '5') // if middle space is free
-        {
-            move(board, computerSymbol, 4);
-        }
-        else if (board[3] == '4' || board[7] == '8' || board[5] == '6' || board[1] == '2') // if a side space is free
-        {
-            Integer[] sides = new Integer[] {1, 3, 5, 7};
-            int mv = randomArrayElem(sides);
-            if (!spaceTaken[mv])
-                move(board, computerSymbol, mv);
-            else
-                getComputerMove(difficulty);
-        }
-
-        //return boardState;
+        int randomIndex = randomGenerator.nextInt(list.size());
+        return list.get(randomIndex);
     }
 
-    public <anyType> anyType randomArrayElem(anyType[] array)
+    public List<Integer> getLegitMoves(int[] array)
     {
-        int randomIndex = randomGenerator.nextInt(array.length);
-        return array[randomIndex];
+        List<Integer> freeSpaces = new ArrayList<Integer>();
+        for (int i : array)
+        {
+            if (!spaceTaken[i])
+                freeSpaces.add(i);
+        }
+        return freeSpaces;
     }
 
     public void getPlayerMove()
@@ -383,7 +335,7 @@ public class NoughtsAndCrosses
         in.reset();
     }
 
-    public void drawGrid(char[] board)
+    public void draw(char[] board)
     {
         System.out.println("    |   |");
         System.out.println("  " + board[6] + " | " + board[7] + " | " + board[8]);
