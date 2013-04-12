@@ -2,14 +2,12 @@ import java.util.*;
 
 public class NoughtsAndCrosses
 {
-    char playerSymbol;
-    char computerSymbol;
-    char[] board = new char[9];     // array to hold what is on each square of the board
-    boolean[] spaceTaken = new boolean[9];      // array to hold whether a square of the board is free or not
-    boolean over = false, winningMove = false, boardFull = false;
-    Random randomGenerator = new Random();
-    int playerMoves, computerMoves;
-    private char difficulty;
+    private char playerSymbol, computerSymbol, difficulty;
+    private char[] board = new char[9];     // array to hold what is on each square of the board
+    private boolean[] spaceTaken = new boolean[9];      // array to hold whether a square of the board is free or not
+    private boolean over = false;
+    private final Random randomGenerator = new Random();
+    private int playerMoves, computerMoves;
 
     public static void main(String[] args)
     {
